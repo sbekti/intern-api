@@ -1,4 +1,5 @@
 import { headers } from "next/headers"
+import { connection } from "next/server"
 
 export type Profile = {
   username: string
@@ -78,7 +79,8 @@ function isAllowedStatus(status: number): status is AllowedStatus {
   return status === 401 || status === 403 || status === 404
 }
 
-export function resolveApiBaseUrl() {
+export async function resolveApiBaseUrl() {
+  await connection()
   const baseUrl = process.env.INTERN_API_BASE_URL?.trim()
   if (!baseUrl) {
     throw new Error("INTERN_API_BASE_URL is required")
