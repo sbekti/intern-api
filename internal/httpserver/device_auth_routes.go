@@ -28,9 +28,9 @@ func registerDeviceAuthRoutes(
 		}
 
 		var body api.DeviceCodeCreateRequest
-		if r.ContentLength > 0 {
-			if err := decodeJSON(r, &body); err != nil {
-				writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if r.ContentLength != 0 {
+			if err := decodeJSON(w, r, &body); err != nil {
+				writeDecodeJSONError(w, err)
 				return
 			}
 		}
@@ -103,8 +103,8 @@ func registerDeviceAuthRoutes(
 		}
 
 		var body api.DeviceCodeTokenRequest
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
@@ -128,8 +128,8 @@ func registerDeviceAuthRoutes(
 		}
 
 		var body api.RefreshTokenRequest
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
@@ -153,8 +153,8 @@ func registerDeviceAuthRoutes(
 		}
 
 		var body api.LogoutRequest
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 

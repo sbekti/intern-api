@@ -77,6 +77,7 @@ func main() {
 			AuditLogService:   auditLogService,
 		}),
 		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

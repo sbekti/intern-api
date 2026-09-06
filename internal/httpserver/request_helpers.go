@@ -3,6 +3,7 @@ package httpserver
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,6 +14,8 @@ import (
 	"github.com/sbekti/intern/internal/auditlogs"
 	"github.com/sbekti/intern/internal/auth"
 )
+
+const maxJSONBodyBytes int64 = 1 << 20
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
@@ -27,17 +30,29 @@ func writeAPIError(w http.ResponseWriter, status int, code, message string) {
 	})
 }
 
-func decodeJSON(r *http.Request, dest any) error {
-	decoder := json.NewDecoder(r.Body)
+func decodeJSON(w http.ResponseWriter, r *http.Request, dest any) error {
+	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxJSONBodyBytes))
 	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(dest); err != nil {
 		return err
 	}
-	if decoder.More() {
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err != nil {
+			return err
+		}
 		return errors.New("unexpected trailing json")
 	}
 	return nil
+}
+
+func writeDecodeJSONError(w http.ResponseWriter, err error) {
+	var maxBytesError *http.MaxBytesError
+	if errors.As(err, &maxBytesError) {
+		writeAPIError(w, http.StatusRequestEntityTooLarge, "request_too_large", "request body too large")
+		return
+	}
+	writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
 }
 
 func decodeInt64PathParam(r *http.Request, key string) (int64, error) {

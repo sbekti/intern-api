@@ -78,26 +78,12 @@ function isAllowedStatus(status: number): status is AllowedStatus {
   return status === 401 || status === 403 || status === 404
 }
 
-export async function resolveApiBaseUrl() {
-  if (process.env.INTERN_API_BASE_URL) {
-    return process.env.INTERN_API_BASE_URL.replace(/\/$/, "")
+export function resolveApiBaseUrl() {
+  const baseUrl = process.env.INTERN_API_BASE_URL?.trim()
+  if (!baseUrl) {
+    throw new Error("INTERN_API_BASE_URL is required")
   }
-
-  const requestHeaders = await headers()
-  const host =
-    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host")
-
-  if (!host) {
-    throw new Error("Unable to resolve API host. Set INTERN_API_BASE_URL.")
-  }
-
-  const proto =
-    requestHeaders.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") || host.startsWith("127.0.0.1")
-      ? "http"
-      : "https")
-
-  return `${proto}://${host}`
+  return baseUrl.replace(/\/$/, "")
 }
 
 export async function buildForwardHeaders(

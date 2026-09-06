@@ -75,8 +75,8 @@ func registerNetworkRoutes(
 		}
 
 		var body api.VlanWrite
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
@@ -108,8 +108,8 @@ func registerNetworkRoutes(
 		}
 
 		var body api.VlanPatch
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
@@ -202,8 +202,8 @@ func registerNetworkRoutes(
 		}
 
 		var body api.NetworkDeviceWrite
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
@@ -235,8 +235,8 @@ func registerNetworkRoutes(
 		}
 
 		var body api.NetworkDevicePatch
-		if err := decodeJSON(r, &body); err != nil {
-			writeAPIError(w, http.StatusBadRequest, "bad_request", "invalid request body")
+		if err := decodeJSON(w, r, &body); err != nil {
+			writeDecodeJSONError(w, err)
 			return
 		}
 
