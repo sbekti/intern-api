@@ -23,10 +23,15 @@ FROM alpine:3.24
 LABEL org.opencontainers.image.source="https://github.com/sbekti/intern"
 
 WORKDIR /app
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates \
+    && addgroup -S -g 10001 intern \
+    && adduser -S -D -H -u 10001 -G intern intern
 COPY --from=build /out/intern-api /usr/local/bin/intern-api
 COPY --from=build /out/goose /usr/local/bin/goose
 COPY --from=build /src/db/migrations ./db/migrations
+RUN chmod 0444 ./db/migrations/*.sql
+
+USER intern
 
 EXPOSE 8080
 ENTRYPOINT ["intern-api"]

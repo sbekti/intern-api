@@ -38,6 +38,10 @@ ENV PORT=3000
 
 COPY --from=build /app/web/.next/standalone ./
 COPY --from=build /app/web/.next/static ./web/.next/static
+RUN mkdir -p /app/web/.next/cache \
+    && chown node:node /app/web/.next/cache
+
+USER node
 
 EXPOSE 3000
 CMD ["node", "web/server.js"]
